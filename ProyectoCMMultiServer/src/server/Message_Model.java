@@ -1,6 +1,8 @@
 package server;
 
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -38,6 +40,7 @@ public class Message_Model extends Generic_Model {
     public void getMessages(ArrayList<Message> mensajes, String user_orig, String user_dest)
     throws SQLException {
         Statement stmt = null;
+        Connection con = DriverManager.getConnection(this.getUrl(),this.getUserName(),this.getPassword());
         String query = "Select * from " + this.getDbName() + "." + this.getTableName();
         try {
             stmt = con.createStatement();
@@ -71,17 +74,21 @@ public class Message_Model extends Generic_Model {
                 mensajes.add(auxiliar);
                 }
             }
+            stmt.close();
+            con.close();
         } catch (SQLException e ) {
             //vista.debug.setText(vista.debug.getText()+ e.toString()+"\n");
             System.err.println(e);   
         } finally {
             //vista.debug.setText(vista.debug.getText()+ "Mensajes obtenidos correctamente \n");
-            if (stmt != null) { stmt.close(); }
+            if (stmt != null) { stmt.close(); con.close();}
+            
         }
     }
     
     public void getMessageByDate(ArrayList<Message> mensajes, String user_orig, String user_dest, String date) throws SQLException, ParseException{
         Statement stmt = null;
+        Connection con = DriverManager.getConnection(this.getUrl(),this.getUserName(),this.getPassword());
         String [] init_date = date.split(" ");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -123,31 +130,37 @@ public class Message_Model extends Generic_Model {
                 mensajes.add(auxiliar);
                 //}
             }
+            stmt.close();
+            con.close();
         } catch (SQLException e ) {
-            //vista.debug.setText(vista.debug.getText()+ e.toString()+"\n");
             System.err.println(e);   
         } finally {
-            //vista.debug.setText(vista.debug.getText()+ "Mensajes obtenidos correctamente \n");
-            if (stmt != null) { stmt.close(); }
+            
+            if (stmt != null) { stmt.close(); con.close();}
+            
         }
     }
     
     public void insertMessageIntoDB(String id_orig, String id_dest, String dateTime, String textmessage) throws SQLException{
         String query="INSERT INTO "+ this.getDbName() + "." + this.getTableName()+ " VALUES ('"+id_orig+"', '"+id_dest+"', '"+dateTime+"', 0, 1, '"+textmessage+"')";
-        
+        Connection con = DriverManager.getConnection(this.getUrl(),this.getUserName(),this.getPassword());
         Statement stmt = null;
         try {
             stmt = con.createStatement();
             int rs = stmt.executeUpdate(query);
+            stmt.close(); 
+            con.close();
         } catch (SQLException e ) {
             System.out.println(e);
         } finally {
-            if (stmt != null) {stmt.close();}
+            if (stmt != null) {stmt.close(); con.close();}
+           
         }
     }
     public void changeReadMessage(String id_orig, String id_dest, String dateTime) throws SQLException, ParseException{
         String query= "UPDATE "+ this.getDbName() + "." + this.getTableName()+ " SET read_msg = ? WHERE id_user_orig = ? AND id_user_dest = ? AND datetime=?";
-//        System.out.println(" Voy a actualizar "+ id_orig + " ----- " + id_dest + " ------ " + dateTime);
+        Connection con = DriverManager.getConnection(this.getUrl(),this.getUserName(),this.getPassword());
+//      System.out.println(" Voy a actualizar "+ id_orig + " ----- " + id_dest + " ------ " + dateTime);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date parsedDate = dateFormat.parse(dateTime);
@@ -165,13 +178,15 @@ public class Message_Model extends Generic_Model {
             System.out.println("-------------------------query: "+ preparedStmt.toString());
            
            preparedStmt.executeUpdate();
+           stmt.close(); 
+           con.close();
         } catch (SQLException e ) {
             System.out.println(e);
         } finally {
             if (stmt != null) {
                 //System.out.println("Desconnected to database"); 
                 stmt.close(); 
-//                con.close();
+                con.close();
             }
         }
 

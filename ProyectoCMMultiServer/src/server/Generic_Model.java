@@ -23,7 +23,6 @@ public class Generic_Model {
     protected final String port;
     protected final String dbName;
     protected final String url;
-    protected Connection con;
     
     Generic_Model() throws SQLException{
         user="clasedam2";
@@ -32,8 +31,13 @@ public class Generic_Model {
         ip="clasedam2.ddns.net";
         port="3306";
         dbName="cristomessenger";
+//        user="root";
+//        password="root";
+//        dbms="mysql";
+//        ip="localhost";
+//        port="3306";
+//        dbName="cristomessenger";
         url= "jdbc:"+ this.getDbms()+"://"+this.getIp()+":"+ this.getPort()+ "/" + this.getDbName();
-        con = DriverManager.getConnection(this.getUrl(),this.getUserName(),this.getPassword());
     }   
 
     public String getUserName() {

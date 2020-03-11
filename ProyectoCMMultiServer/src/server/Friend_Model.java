@@ -1,6 +1,8 @@
 package server;
 
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -31,6 +33,7 @@ public class Friend_Model extends Generic_Model {
     public void getAllAmigos(ArrayList<Friend>amigos, String user)
     throws SQLException {
         Statement stmt = null;
+        Connection con = DriverManager.getConnection(this.getUrl(),this.getUserName(),this.getPassword());
         String query = "Select * from " + this.getDbName() + "." + this.getTableName();
         try {
             stmt = con.createStatement();
@@ -45,12 +48,15 @@ public class Friend_Model extends Generic_Model {
                     amigos.add(auxiliar);
                 }
             }
+            stmt.close();
+            con.close();
         } catch (SQLException e ) {
             //vista.debug.setText(vista.debug.getText()+ e.toString()+"\n");
             System.err.println(e);   
         } finally {
             //vista.debug.setText(vista.debug.getText()+" Lista de amigos obtenida correctamente \n");
-            if (stmt != null) { stmt.close(); }
+            if (stmt != null) { stmt.close(); con.close();}
+            
         }
     }
 

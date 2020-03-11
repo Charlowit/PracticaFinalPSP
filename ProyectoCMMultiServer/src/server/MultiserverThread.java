@@ -13,6 +13,8 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,6 +25,7 @@ import java.util.logging.Logger;
 public class MultiserverThread extends Thread{
     
     private Socket socket = null;
+    private Lock mutex= new ReentrantLock();
     
     PrintWriter out;
     BufferedReader in;
@@ -41,6 +44,7 @@ public class MultiserverThread extends Thread{
             Protocolo protocolo = new Protocolo();
  
             while ((inputLine = in.readLine()) != null) {
+                mutex.lock();
                 System.out.println(socket.getInetAddress().getHostAddress() + " " + inputLine);
                 salidas = protocolo.processInput(inputLine, this);
                 
@@ -51,14 +55,14 @@ public class MultiserverThread extends Thread{
                             outputLine = salidas.get(i);
                             out.println(outputLine);
                             System.out.println("Server: "+ outputLine);
-                            Debug.debugServer.setText(Debug.debugServer.getText() + outputLine + "\n");
+                            //Debug.debugServer.setText(Debug.debugServer.getText() + outputLine + "\n");
                         }
                     }
                     else if(salidas.get(0).equals("GETPHOTO!")){
                         outputLine = salidas.get(1);
                         out.println(outputLine);
                         System.out.println("Server: "+ outputLine);
-                        Debug.debugServer.setText(Debug.debugServer.getText() + outputLine + "\n");
+                        //Debug.debugServer.setText(Debug.debugServer.getText() + outputLine + "\n");
                         for(int i=2; i < salidas.size()-1 ; i++){
                            outputLine = salidas.get(i);
                             out.println(outputLine);
@@ -68,7 +72,7 @@ public class MultiserverThread extends Thread{
                         outputLine = salidas.get(salidas.size()-1);
                         System.out.println("Server: "+ outputLine);
                         out.println(outputLine);
-                        Debug.debugServer.setText(Debug.debugServer.getText() + outputLine + "\n");
+                        //Debug.debugServer.setText(Debug.debugServer.getText() + outputLine + "\n");
                     }
                     else{
                        
@@ -76,7 +80,7 @@ public class MultiserverThread extends Thread{
                         outputLine = salidas.get(0);
                         out.println(outputLine);
                         System.out.println("Server: "+ outputLine);
-                        Debug.debugServer.setText(Debug.debugServer.getText() + outputLine + "\n");
+                        //Debug.debugServer.setText(Debug.debugServer.getText() + outputLine + "\n");
                         int wrongPackage = outputLine.indexOf("SERVER");
                         String wrongLine = outputLine.substring(wrongPackage);
                         if (wrongLine.equals("SERVER#ERROR#BAD_LOGIN"))
@@ -85,8 +89,9 @@ public class MultiserverThread extends Thread{
                             break;
                         }     
                     }
-                }    
-
+                }
+                
+                mutex.unlock();
             }
 
             socket.close();
@@ -94,6 +99,7 @@ public class MultiserverThread extends Thread{
             e.printStackTrace();
             try {
                 this.socket.close();
+                this.setName("removed");
                 Multiserver.arrayhebras.remove(this);
             } catch (IOException ex) {
                 Logger.getLogger(MultiserverThread.class.getName()).log(Level.SEVERE, null, ex);
@@ -110,7 +116,7 @@ public class MultiserverThread extends Thread{
             try {
                 this.socket.close();
             } catch (IOException ex) {
-                Debug.debugServer.setText(ex + "\n" );
+                //Debug.debugServer.setText(ex + "\n" );
                 Logger.getLogger(MultiserverThread.class.getName()).log(Level.SEVERE, null, ex);
             }
     
