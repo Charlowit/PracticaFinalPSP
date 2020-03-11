@@ -96,7 +96,7 @@ public class Message_Model extends Generic_Model {
         String [] limit_date = limit.split(" ");
         
         
-        String query = "Select * from " + this.getDbName() + "." + this.getTableName()+" WHERE (((id_user_orig='" + user_orig+"' AND id_user_dest='"+ user_dest +"') OR (id_user_orig='" + user_dest+"' AND id_user_dest='"+ user_orig +"')) AND dateTime between '"+init_date[0] +"' and '"+limit_date[0] +"')";
+        String query = "Select * from " + this.getDbName() + "." + this.getTableName()+" WHERE (((id_user_orig='" + user_orig+"' AND id_user_dest='"+ user_dest +"') OR (id_user_orig='" + user_dest+"' AND id_user_dest='"+ user_orig +"')) AND dateTime between '"+init_date[0] +"' and '"+limit_date[0] +"') ORDER BY datetime";
         try {
             stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
