@@ -80,6 +80,7 @@ public class Close_Session extends Thread {
                         user_controller.changeCloseSession(friends_connected.get(k));
                     }
                 }
+                
             }
         } catch (SQLException ex) {
             Logger.getLogger(Close_Session.class.getName()).log(Level.SEVERE, null, ex);

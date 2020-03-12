@@ -247,6 +247,7 @@ public class User_Model extends Generic_Model {
                 //Debug.debugServer.setText(Debug.debugServer.getText()+ " He cambiado el estado \n");
                 stmt.close(); 
                 con.close();
+                System.out.println("He cerrado sesion");
             } catch (SQLException e ) {
 
                // vista.debug.setText(vista.debug.getText()+ e.toString()+"\n");
